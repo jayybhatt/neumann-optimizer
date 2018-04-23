@@ -77,9 +77,9 @@ class Neumann(Optimizer):
                 mu = momentum*(1 - (1/(1+self.iter)))
                 eta = group['lr'] ## update with time
 
-                ## Reset neumann 
+                ## Reset neumann iterate 
                 if self.iter%K == 1:
-                    
+                    state['m'] = - eta*grad
 
                 ## Compute update d_t
                 diff = p.data - state['moving_avg']
@@ -98,7 +98,7 @@ class Neumann(Optimizer):
 
 
         
-        return loss
+        # return loss
 
 
         
