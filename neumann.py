@@ -1,6 +1,6 @@
 import math
 import torch
-from .Optimizer import Optimizer
+from .optimizer import Optimizer
 from .sgd import SGD
 
 class Neumann(Optimizer):
@@ -30,7 +30,7 @@ class Neumann(Optimizer):
         super(Neumann, self).__init__(params, defaults)
 
 
-    def step(self, closure):
+    def step(self, closure=None):
         """
         Performs a single optimization step.
         
@@ -41,15 +41,18 @@ class Neumann(Optimizer):
         self.iter += 1
 
 
-        if self.iter <= sgd_steps:
-            SGD.step()
-            return
-
-        # loss = None
-        # if closure is not None: #checkout what's the deal with this. present in multiple pytorch optimizers
-        #     loss = closure()
+        loss = None
+        if closure is not None: #checkout what's the deal with this. present in multiple pytorch optimizers
+            loss = closure()
 
         for group in self.param_groups:
+
+            sgd_steps = group['sgd_steps']
+
+            if self.iter <= sgd_steps:
+                self.sgd.step()
+                return
+
             momentum = group['momentum']
             
             
@@ -78,26 +81,23 @@ class Neumann(Optimizer):
 
                 ## Reset neumann iterate 
                 if self.iter%K == 1:
-                    state['m'] = - eta*grad
+                    state['m'] = grad.mul(-eta)
 
                 ## Compute update d_t
-                diff = p.data - state['moving_avg']
-                diff_norm = (p.data - state['moving_avg']).norm()
-                state['d'] = grad + (alpha* diff_norm.pow(2) - beta/(diff_norm.pow(2))) * diff/diff_norm
+                diff = p.data.sub(state['moving_avg'])
+                diff_norm = (p.data.sub(state['moving_avg'])).norm()
+                state['d'] = grad.add( (( (diff_norm.pow(2)).mul(alpha) ).sub( (diff_norm.pow(-2)).mul(beta) )).mul( diff.div(diff_norm)) )
 
                 ## Update Neumann iterate
-                state['m'] = mu*state['m'] - eta*state['d']
+                state['m'] = (state['m'].mul_(mu)).sub_( state['d'].mul(eta))
 
                 ## Update Weights
-                p.data = p.data + mu*state['m'] - eta*state['d']
+                p.data.add_((state['m'].mul(mu)).sub( state['d'].mul(eta)))
 
                 ## Update Moving Average
-                state['moving_avg'] = p.data + gamma*(state['moving_avg'] - p.data)
+                state['moving_avg'] = p.data.add( (state['moving_avg'].sub(p.data)).mul(gamma) )
 
 
 
         
         # return loss
-
-
-        
