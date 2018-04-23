@@ -1,8 +1,7 @@
 import math
 import torch
-from torch.optim.optimizer import Optimizer
-from torch.optim import SGD
-import pdb; pdb.set_trace()
+from .Optimizer import Optimizer
+from .sgd import SGD
 
 class Neumann(Optimizer):
     """
@@ -15,8 +14,8 @@ class Neumann(Optimizer):
             raise ValueError("Invalid learning rate: {}".format(lr))
         if not 0.0 <= eps:
             raise ValueError("Invalid epsilon value: {}".format(eps))
-        if not 0.9 >= mu:
-            raise ValueError("Invalid mu value: {}".format(eps))
+        if not 0.9 >= momentum:
+            raise ValueError("Invalid momentum value: {}".format(eps))
         
 
         self.iter = 0
@@ -75,7 +74,7 @@ class Neumann(Optimizer):
                 K = group['K']
                 momentum = group['momentum']
                 mu = momentum*(1 - (1/(1+self.iter)))
-                eta = group['lr'] ## update with time
+                eta = group['lr']/self.iter ## update with time
 
                 ## Reset neumann iterate 
                 if self.iter%K == 1:
