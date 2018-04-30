@@ -20,6 +20,8 @@ class Net(nn.Module):
         self.conv_layer2 = nn.Conv2d(6, 16, 5)
         self.linear_layer1 = nn.Linear(16 * 4 * 4, 120)
         self.linear_layer2 = nn.Linear(120, 10)
+        self.tanh = nn.Tanh()
+        self.sigmoid = nn.Sigmoid()
     # end __init__
 
     # Forward pass
@@ -42,8 +44,12 @@ class Net(nn.Module):
         x = self.pool(x)
         # print(u"Input : {}".format(x.size()))
         x = x.view(-1, 16 * 4 * 4)
-        x = F.relu(self.linear_layer1(x))
-        x = F.relu(self.linear_layer2(x))
+        x = self.linear_layer1(x)
+        x = self.tanh(x)
+        x = self.linear_layer2(x)
+        x = self.sigmoid(x)
+        # x = F.relu(self.linear_layer1(x))
+        # x = F.relu(self.linear_layer2(x))
         return x
     # end forward
 
