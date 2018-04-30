@@ -1,9 +1,9 @@
 import math
 import torch
 from torch.optim.optimizer import Optimizer
-from torch.optim.sgd import SGD 
+from torch.optim.sgd import SGD
 import numpy as np
-import pdb; pdb.set_trace()
+# import pdb; pdb.set_trace()
 
 class Neumann(Optimizer):
     """
@@ -11,14 +11,14 @@ class Neumann(Optimizer):
     """
 
     def __init__(self, params , lr=1e-3,eps = 1e-8, alpha = 1e-7, beta = 1e-5, gamma = 0.9, momentum = 1, sgd_steps = 5, K = 10 ):
-        
+
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if not 0.0 <= eps:
             raise ValueError("Invalid epsilon value: {}".format(eps))
         if not 1 >= momentum:
             raise ValueError("Invalid momentum value: {}".format(eps))
-        
+
 
         self.iter = 0
         self.sgd = SGD(params, lr=lr, momentum=0.9)
@@ -36,7 +36,7 @@ class Neumann(Optimizer):
     def step(self, closure=None):
         """
         Performs a single optimization step.
-        
+
         Arguments:
             closure (callable, optional): A closure that reevaluates the model
                 and returns the loss.
@@ -67,8 +67,8 @@ class Neumann(Optimizer):
 
             if self.iter == 8:
                 print("here")
-            
-            
+
+
             for p in group['params']:
                 if p.grad is None:
                     continue
@@ -85,7 +85,7 @@ class Neumann(Optimizer):
                 state['step'] += 1
 
 
-                ## Reset neumann iterate 
+                ## Reset neumann iterate
                 if self.iter%K == 0:
                     state['m'] = grad.mul(-eta)
                     group['K'] = group['K']*2
@@ -109,5 +109,5 @@ class Neumann(Optimizer):
 
 
 
-        
+
         # return loss
