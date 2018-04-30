@@ -68,6 +68,10 @@ class Neumann(Optimizer):
             if self.iter == 8:
                 print("here")
 
+            if mu >= 0.9:
+                mu = 0.9
+            elif mu <= 0.5:
+                mu = 0.5
 
             for p in group['params']:
                 if p.grad is None:

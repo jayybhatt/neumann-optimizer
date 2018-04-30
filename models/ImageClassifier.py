@@ -61,7 +61,7 @@ imshow(torchvision.utils.make_grid(images))
 # Our neural net
 net = Net()
 
-# uncomment below line if running on GPU 
+# uncomment below line if running on GPU
 #net.cuda()
 
 # Objective function is cross-entropy
@@ -71,8 +71,8 @@ criterion = nn.CrossEntropyLoss()
 learning_rate = 0.001
 
 # Stochastic Gradient Descent
-optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
-#optimizer = Neumann(net.parameters(), lr=learning_rate, momentum = 0.9)
+# optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
+optimizer = Neumann(list(net.parameters()), lr=learning_rate, momentum = 0.9)
 
 # Nb iterations
 n_iterations = 30
@@ -114,7 +114,7 @@ for epoch in range(n_iterations):
         optimizer.step()
 
         # Add to loss
-        average_loss += loss.data[0]
+        average_loss += loss
 
         # Take the max as predicted
         _, predicted = torch.max(outputs.data, 1)

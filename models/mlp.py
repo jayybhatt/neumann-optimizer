@@ -57,8 +57,8 @@ device = torch.device('cpu')
 net = MultilayerPerceptron(input_size, hidden_size, num_classes)
 
 loss_fn = nn.MSELoss()
-# optimizer = Neumann(list(net.parameters()), lr=learning_rate)
-optimizer = SGD(net.parameters(), lr=learning_rate)
+optimizer = Neumann(list(net.parameters()), lr=learning_rate)
+# optimizer = SGD(net.parameters(), lr=learning_rate)
 
 for epoch in range(num_epochs):
     for batch_X, batch_Y in ds.batch_iterator(batch_size=minibatch_size, shuffle=True):
