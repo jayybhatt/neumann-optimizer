@@ -38,10 +38,14 @@ class MultilayerPerceptron(nn.Module):
         super(MultilayerPerceptron, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, num_classes)
+        self.tanh = nn.Tanh()
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         out = self.fc1(x)
+        out = self.tanh(out)
         out = self.fc2(out)
+        out = self.sigmoid(out)
         return out
 
 
@@ -57,8 +61,8 @@ device = torch.device('cpu')
 net = MultilayerPerceptron(input_size, hidden_size, num_classes)
 
 loss_fn = nn.MSELoss()
-# optimizer = Neumann(list(net.parameters()), lr=learning_rate)
-optimizer = SGD(net.parameters(), lr=learning_rate)
+optimizer = Neumann(list(net.parameters()), lr=learning_rate)
+# optimizer = SGD(net.parameters(), lr=learning_rate)
 
 for epoch in range(num_epochs):
     for batch_X, batch_Y in ds.batch_iterator(batch_size=minibatch_size, shuffle=True):
@@ -69,11 +73,13 @@ for epoch in range(num_epochs):
         loss = loss_fn(outputs, label)
         loss.backward()
         optimizer.step()
-        print("Loss: ", loss)
+    print("Loss: ", loss)
 
-test_inputs = torch.tensor(test_X, device=device)
-test_labels = torch.tensor(test_Y, device=device)
+test_inputs = torch.tensor(test_X, device=device, dtype=torch.float32)
+test_labels = torch.tensor(test_Y, device=device, dtype=torch.float32)
 
 outputs = net(test_inputs)
 
+error = loss_fn(outputs, test_labels)
 print(outputs)
+print("Error: ", error)

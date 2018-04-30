@@ -68,6 +68,10 @@ class Neumann(Optimizer):
             if self.iter == 8:
                 print("here")
 
+            if mu >= 0.9:
+                mu = 0.9
+            elif mu <= 0.5:
+                mu = 0.5
 
             for p in group['params']:
                 if p.grad is None:
@@ -92,7 +96,7 @@ class Neumann(Optimizer):
 
                 ## Compute update d_t
                 diff = p.data.sub(state['moving_avg'])
-                diff_norm = (p.data.sub(state['moving_avg'])).norm()
+                diff_norm = (p.data.sub(state['moving_avg'])).norm(p=1)
                 if np.count_nonzero(diff):
                     state['d'] = grad.add( (( (diff_norm.pow(2)).mul(alpha) ).sub( (diff_norm.pow(-2)).mul(beta) )).mul( diff.div(diff_norm)) )
                 else:

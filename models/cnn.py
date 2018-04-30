@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import math
 from torch.optim.optimizer import Optimizer
 from torch.optim.sgd import SGD
-from neumann import Neumann
+from optimizer import Neumann
 import sys
 
 # import pdb; pdb.set_trace()
@@ -49,7 +49,7 @@ class ActionDataset(Dataset):
         return self.length*3
 
     def __getitem__(self, idx):
-        
+
         folder=idx//3+1
         imidx= idx%3+1
         folder=format(folder,'05d')
@@ -66,7 +66,7 @@ class ActionDataset(Dataset):
         else:
             sample={'image':image,'img_path':img_path}
         return sample
-  
+
 
 
 dtype = torch.FloatTensor # the CPU datatype
@@ -96,7 +96,7 @@ def train(model, loss_fn, optimizer, dataloader, num_epochs = 1):
             y_var = Variable(sample['Label'].cuda().long())
 
             scores = model(x_var)
-            
+
             loss = loss_fn(scores, y_var)
             if (t + 1) % 1 == 0:
                 print('t = %d, loss = %.4f' % (t + 1, loss.data[0]))
@@ -111,7 +111,7 @@ def check_accuracy(model, loader):
     if loader.dataset.train:
         print('Checking accuracy on validation set')
     else:
-        print('Checking accuracy on test set')  
+        print('Checking accuracy on test set')
     '''
     num_correct = 0
     num_samples = 0
@@ -151,7 +151,7 @@ image_dataloader_test = DataLoader(image_dataset_test, batch_size=batch_size,
 
 
 ###########3rd To Do (16 points, must submit the results to Kaggle) ##############
-# Train your model here, and make sure the output of this cell is the accuracy of your best model on the 
+# Train your model here, and make sure the output of this cell is the accuracy of your best model on the
 # train, val, and test sets. Here's some code to get you started. The output of this cell should be the training
 # and validation accuracy on your best model (measured by validation accuracy).
 
@@ -160,13 +160,13 @@ model = nn.Sequential(
             nn.BatchNorm2d(32),
             nn.LeakyReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2,stride=2),#8*29*29
-    
+
             nn.Conv2d(32,128,kernel_size=3,stride=2),#16*23*23, 15
             nn.BatchNorm2d(128),
             nn.LeakyReLU(inplace=True),
             nn.Dropout2d(p=0.4),
             nn.MaxPool2d(kernel_size=2,stride=2),#16*11*11
-            
+
             nn.Conv2d(128,256,kernel_size=3,stride=1),
             nn.BatchNorm2d(256),
             nn.LeakyReLU(inplace=True),
