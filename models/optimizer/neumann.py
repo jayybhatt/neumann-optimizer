@@ -96,7 +96,7 @@ class Neumann(Optimizer):
 
                 ## Compute update d_t
                 diff = p.data.sub(state['moving_avg'])
-                diff_norm = (p.data.sub(state['moving_avg'])).norm()
+                diff_norm = (p.data.sub(state['moving_avg'])).norm(p=1)
                 if np.count_nonzero(diff):
                     state['d'] = grad.add( (( (diff_norm.pow(2)).mul(alpha) ).sub( (diff_norm.pow(-2)).mul(beta) )).mul( diff.div(diff_norm)) )
                 else:
