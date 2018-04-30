@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from optimizer import Neumann
+from optimizer import Neumann,SGD
 import numpy as np
 
 from batchup import data_source
@@ -57,7 +57,8 @@ device = torch.device('cpu')
 net = MultilayerPerceptron(input_size, hidden_size, num_classes)
 
 loss_fn = nn.MSELoss()
-optimizer = Neumann(list(net.parameters()), lr=learning_rate)
+# optimizer = Neumann(list(net.parameters()), lr=learning_rate)
+optimizer = SGD(net.parameters(), lr=learning_rate)
 
 for epoch in range(num_epochs):
     for batch_X, batch_Y in ds.batch_iterator(batch_size=minibatch_size, shuffle=True):
@@ -68,7 +69,7 @@ for epoch in range(num_epochs):
         loss = loss_fn(outputs, label)
         loss.backward()
         optimizer.step()
-        print("Loss: ", loss.data.numpy())
+        print("Loss: ", loss)
 
 test_inputs = torch.tensor(test_X, device=device)
 test_labels = torch.tensor(test_Y, device=device)
